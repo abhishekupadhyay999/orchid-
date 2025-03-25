@@ -118,41 +118,66 @@ const Element = ({ pageTitle }) => {
             <h4 className="card-title">{id ? "Edit Insta" : "Create Insta"}</h4>
           </div>
           <div className="card-body">
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label className="form-label">Image Text</label>
-                <input type="text" className="form-control" value={imgText} onChange={(e) => setImgText(e.target.value)} />
-                {errors.img_text && <div className="text-danger">{errors.img_text}</div>}
-              </div>
+          <form onSubmit={handleSubmit}>
+  <div className="row mb-3">
+    <div className="col-md-6">
+      <label className="form-label">Image Text</label>
+      <input
+        type="text"
+        className="form-control"
+        value={imgText}
+        onChange={(e) => setImgText(e.target.value)}
+      />
+      {errors.img_text && <div className="text-danger">{errors.img_text}</div>}
+    </div>
+    <div className="col-md-6">
+      <label className="form-label">Redirect Link</label>
+      <input
+        type="text"
+        className="form-control"
+        value={redirectLink}
+        onChange={(e) => setRedirectLink(e.target.value)}
+      />
+      {errors.redirect_link && <div className="text-danger">{errors.redirect_link}</div>}
+    </div>
+  </div>
 
-              <div className="mb-3">
-                <label className="form-label">Redirect Link</label>
-                <input type="text" className="form-control" value={redirectLink} onChange={(e) => setRedirectLink(e.target.value)} />
-                {errors.redirect_link && <div className="text-danger">{errors.redirect_link}</div>}
-              </div>
+  <div className="row mb-3">
+    <div className="col-md-6">
+      <label className="form-label">Redirect Text</label>
+      <input
+        type="text"
+        className="form-control"
+        value={redirectText}
+        onChange={(e) => setRedirectText(e.target.value)}
+      />
+      {errors.redirect_text && <div className="text-danger">{errors.redirect_text}</div>}
+    </div>
+    <div className="col-md-6">
+      <label className="form-label">Image Position</label>
+      <input
+        type="text"
+        className="form-control"
+        value={imgPosition}
+        onChange={(e) => setImgPosition(e.target.value)}
+      />
+      {errors.img_position && <div className="text-danger">{errors.img_position}</div>}
+    </div>
+  </div>
 
-              <div className="mb-3">
-                <label className="form-label">Redirect Text</label>
-                <input type="text" className="form-control" value={redirectText} onChange={(e) => setRedirectText(e.target.value)} />
-                {errors.redirect_text && <div className="text-danger">{errors.redirect_text}</div>}
-              </div>
+  <div className="mb-3">
+    <label className="form-label">Image for Hero Section</label>
+    <input className="form-control" type="file" onChange={handleFileChange} />
+    {errors.image && <div className="text-danger">{errors.image}</div>}
+  </div>
 
-              <div className="mb-3">
-                <label className="form-label">Image Position</label>
-                <input type="text" className="form-control" value={imgPosition} onChange={(e) => setImgPosition(e.target.value)} />
-                {errors.img_position && <div className="text-danger">{errors.img_position}</div>}
-              </div>
+  {previewImage && <Image src={previewImage} alt="insta" width="150" height="150" />}
 
-              <div className="mb-3">
-                <label className="form-label">Image for Hero Section</label>
-                <input className="form-control" type="file" onChange={handleFileChange} />
-                {errors.image && <div className="text-danger">{errors.image}</div>}
-              </div>
+  <button type="submit" className="btn btn-primary" disabled={isSubmitting} style={{justifySelf:'center'}}>
+    {isSubmitting ? "Submitting..." : id ? "Update Insta" : "Create Insta"}
+  </button>
+</form>
 
-              {previewImage && <Image src={previewImage} alt="hero" width="150" height="150" />}
-
-              <button type="submit" className="btn btn-primary" disabled={isSubmitting}>{isSubmitting ? "Submitting..." : id ? "Update Hero" : "Create Hero"}</button>
-            </form>
           </div>
         </div>
       </div>

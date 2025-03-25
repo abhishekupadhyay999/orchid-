@@ -89,6 +89,10 @@ const Sidebar = () => {
       "form/validation",
     ],
     hero = ["hero"],
+    insta = ["insta"],
+    offer = ["offer"],
+    property= ["property"],
+    video = ["video"],
     table = ["table-bootstrap-basic", "table-datatable-basic"],
     pages = [
       "page-register",
@@ -500,14 +504,32 @@ const Sidebar = () => {
             </li> */}
             <li className={`${hero.includes(path) ? "mm-active" : ""}`}>
               <Link href="/hero/herolist" className="ai-icon" passHref>
-                  <i className="flaticon-013-checkmark" />
+                  <i className="flaticon-086-star" />
                   <span className="nav-text">Hero</span>                
               </Link>
             </li>
-            <li className={`${hero.includes(path) ? "mm-active" : ""}`}>
-              <Link href="/hero/destinationList" className="ai-icon" passHref>
+            <li className={`${insta.includes(path) ? "mm-active" : ""}`}>
+              <Link href="/insta/createInstaStories" className="ai-icon" passHref>
                   <i className="flaticon-013-checkmark" />
-                  <span className="nav-text">Destination</span>                
+                  <span className="nav-text">Insta</span>                
+              </Link>
+            </li>
+            <li className={`${offer.includes(path) ? "mm-active" : ""}`}>
+              <Link href="/offer/createOffer" className="ai-icon" passHref>
+                  <i className="flaticon-043-menu" />
+                  <span className="nav-text">Offer</span>                
+              </Link>
+            </li>
+            <li className={`${property.includes(path) ? "mm-active" : ""}`}>
+              <Link href="/property/createProperty" className="ai-icon" passHref>
+                  <i className="flaticon-013-checkmark" />
+                  <span className="nav-text">Property</span>                
+              </Link>
+            </li>
+            <li className={`${video.includes(path) ? "mm-active" : ""}`}>
+              <Link href="/video/createVideo" className="ai-icon" passHref>
+                  <i className="flaticon-072-printer" />
+                  <span className="nav-text">Video</span>                
               </Link>
             </li>
             {/* <li className={`${forms.includes(path) ? "mm-active" : ""}`}>

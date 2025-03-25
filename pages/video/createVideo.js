@@ -21,14 +21,13 @@ const Element = ({ pageTitle }) => {
     if (version !== "dark") {
       moodChange();
     }
-    pageTitle(id ? "Edit Hero" : "Create Hero");
+    pageTitle(id ? "Edit Video" : "Create Video");
 
     if (id) {
       fetchHeroData(id);
     }
   }, [id, pageTitle, version]);
 
-  // Fetch hero details if ID is present
   const fetchHeroData = async (heroId) => {
     try {
       const response = await axios.post("http://localhost:4000/api/hero/get-heros", { id: heroId });
@@ -114,13 +113,13 @@ const Element = ({ pageTitle }) => {
         <div className="col-xl-6 col-lg-6">
           <div className="card">
             <div className="card-header">
-              <h4 className="card-title">{id ? "Edit Hero" : "Create Hero"}</h4>
+              <h4 className="card-title">{id ? "Edit Video" : "Create Video"}</h4>
             </div>
             <div className="card-body">
               <div className="basic-form">
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
-                    <label htmlFor="title" className="form-label">Hero Text</label>
+                    <label htmlFor="title" className="form-label">Video Text</label>
                     <input
                       id="title"
                       type="text"
@@ -134,7 +133,7 @@ const Element = ({ pageTitle }) => {
                   </div>
 
                   <div className="mb-3">
-                    <label htmlFor="formFile" className="form-label">Image for Hero Section</label>
+                    <label htmlFor="formFile" className="form-label">Video for Hero Section</label>
                     <input className="form-control" type="file" id="formFile" name="image" onChange={handleFileChange} />
                     {errors.image && <div className="text-danger">{errors.image}</div>}
                   </div>
@@ -148,7 +147,7 @@ const Element = ({ pageTitle }) => {
                   )}
 
                   <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                    {isSubmitting ? "Submitting..." : id ? "Update Hero" : "Create Hero"}
+                    {isSubmitting ? "Submitting..." : id ? "Update Video" : "Create Video"}
                   </button>
                 </form>
               </div>

@@ -126,66 +126,79 @@ const Offer = ({ pageTitle }) => {
             <h4 className="card-title">{id ? "Edit Offer" : "Create Offer"}</h4>
           </div>
           <div className="card-body">
-            <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-            <label className="form-label">Description</label>
-            <input
-              type="text"
-              className="form-control"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            {errors.description && <div className="text-danger">{errors.description}</div>}
-          </div>
-          <div className="mb-3">
-          <label className="form-label">Image Text</label>
-          <input
-            type="text"
-            className="form-control"
-            value={imgText}
-            onChange={(e) => setImgText(e.target.value)}
-          />
-          {errors.img_text && <div className="text-danger">{errors.img_text}</div>}
-        </div>
-        <div className="mb-3">
-            <label className="form-label">Redirect Link</label>
-            <input
-              type="text"
-              className="form-control"
-              value={redirectLink}
-              onChange={(e) => setRedirectLink(e.target.value)}
-            />
-            {errors.redirect_link && <div className="text-danger">{errors.redirect_link}</div>}
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Location Details</label>
-            <input
-              type="text"
-              className="form-control"
-              value={locationDetails}
-              onChange={(e) => setLocationDetails(e.target.value)}
-            />
-            {errors.location_details && <div className="text-danger">{errors.location_details}</div>}
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Offer Date</label>
-            <input
-              type="date"
-              className="form-control"
-              value={offerDate}
-              onChange={(e) => setOfferDate(e.target.value)}
-            />
-            {errors.offer_date && <div className="text-danger">{errors.offer_date}</div>}
-          </div>
+          <form onSubmit={handleSubmit}>
+  <div className="row mb-3">
+    <div className="col-md-6">
+      <label className="form-label">Description</label>
+      <input
+        type="text"
+        className="form-control"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      {errors.description && <div className="text-danger">{errors.description}</div>}
+    </div>
+    <div className="col-md-6">
+      <label className="form-label">Image Text</label>
+      <input
+        type="text"
+        className="form-control"
+        value={imgText}
+        onChange={(e) => setImgText(e.target.value)}
+      />
+      {errors.img_text && <div className="text-danger">{errors.img_text}</div>}
+    </div>
+  </div>
 
+  <div className="row mb-3">
+    <div className="col-md-6">
+      <label className="form-label">Redirect Link</label>
+      <input
+        type="text"
+        className="form-control"
+        value={redirectLink}
+        onChange={(e) => setRedirectLink(e.target.value)}
+      />
+      {errors.redirect_link && <div className="text-danger">{errors.redirect_link}</div>}
+    </div>
+    <div className="col-md-6">
+      <label className="form-label">Location Details</label>
+      <input
+        type="text"
+        className="form-control"
+        value={locationDetails}
+        onChange={(e) => setLocationDetails(e.target.value)}
+      />
+      {errors.location_details && <div className="text-danger">{errors.location_details}</div>}
+    </div>
+  </div>
 
-              <div className="mb-3">
-                <label className="form-label">Image</label>
-                <input className="form-control" type="file" onChange={handleFileChange} />
-                {errors.image && <div className="text-danger">{errors.image}</div>}
-                {previewImage && <Image src={previewImage} alt="Offer" width={150} height={150} />}
-              </div>
-            </form>
+  <div className="row mb-3">
+    <div className="col-md-6">
+      <label className="form-label">Offer Date</label>
+      <input
+        type="date"
+        className="form-control"
+        value={offerDate}
+        onChange={(e) => setOfferDate(e.target.value)}
+      />
+      {errors.offer_date && <div className="text-danger">{errors.offer_date}</div>}
+    </div>
+    <div className="col-md-6">
+      <label className="form-label">Image</label>
+      <input className="form-control" type="file" onChange={handleFileChange} />
+      {errors.image && <div className="text-danger">{errors.image}</div>}
+      {previewImage && <Image src={previewImage} alt="Offer" width={150} height={150} />}
+    </div>
+  </div>
+
+  <div className="d-flex justify-content-center">
+    <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+      {isSubmitting ? "Submitting..." : id ? "Update Offer" : "Create Offer"}
+    </button>
+  </div>
+</form>
+
           </div>
         </div>
       </div>
