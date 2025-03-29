@@ -15,15 +15,15 @@ const Element = ({ pageTitle }) => {
     if (version !== "dark") {
       moodChange();
     }
-    pageTitle("Hero Create");
+    pageTitle("Property List");
   }, [pageTitle, version]);
 
   const [rows, setRows] = useState([]);
 
-  useEffect(() => {
-    axios
+  const fetch =async () => {
+    await axios
       .post(
-        "http://localhost:4000/api/hero/get-heros",
+        "http://localhost:4000/api/property/get-properties",
         {},
         {
           headers: {},
@@ -32,9 +32,9 @@ const Element = ({ pageTitle }) => {
       .then((response) => {
         const formattedData = response.data.map((item) => ({
           id: item.id,
-          title: item.title,
-          image: item.image
-            ? `data:image/png;base64,${Buffer.from(item.image.data).toString(
+          title: item.img_text,
+          image: item.img
+            ? `data:image/png;base64,${Buffer.from(item.img.data).toString(
                 "base64"
               )}`
             : null,
@@ -46,6 +46,10 @@ const Element = ({ pageTitle }) => {
         // setRows(formattedData);
       })
       .catch((error) => console.error("Error fetching data:", error));
+    }
+
+  useEffect(() => {
+    fetch()
   }, []);
 
   const columns = [
@@ -58,7 +62,7 @@ const Element = ({ pageTitle }) => {
       flex: 1,
       renderCell: (params) =>
         params.value ? (
-          <Image src={params.value} alt="hero" width="150" height="150" />
+          <Image src={params.value} alt="property" width="150" height="150" />
         ) : (
           "No Image"
         ),
@@ -93,21 +97,23 @@ const Element = ({ pageTitle }) => {
     },
   ];
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const payload = {
       id: id,
     };
-    const response = axios.post(
-      "http://localhost:4000/api/hero/delete-hero",
+    const response = await axios.post(
+      "http://localhost:4000/api/property/delete-property",
       payload,
       {
         headers: {},
       }
-    );
-    console.log(response);
+    );  
+    if(response.data.status == 200){
+      fetch()
+    }
   };
   const handleEdit = (id) => {
-    router.push(`/hero/${id}`);
+    router.push(`/property/${id}`);
   };
 
   return (
@@ -121,7 +127,7 @@ const Element = ({ pageTitle }) => {
           <Button
             variant="contained"
             color="success"
-            onClick={() => router.push("/hero/createDestination")}
+            onClick={() => router.push("/property/createproperty")}
           >
             Create
           </Button>

@@ -6,12 +6,18 @@ import { moodChange, pageTitle } from "../../src/redux/action/utils";
 import { useForm } from "react-hook-form"; // Import useForm from react-hook-form
 import { yupResolver } from "@hookform/resolvers/yup"; // Import yupResolver
 import * as Yup from "yup"; // Import Yup
+import Image from "next/image";
+import { toast } from "react-toastify";
+
 
 const Property = ({ pageTitle }) => {
   const router = useRouter();
   const { id } = router.query;
   const version = useSelector((state) => state.theme.version);
-
+  const [previewImg1, setPreviewImg1] = useState(null);
+  const [previewImg2, setPreviewImg2] = useState(null);
+  const [previewImg3, setPreviewImg3] = useState(null);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Define Yup schema for validation
@@ -27,35 +33,35 @@ const Property = ({ pageTitle }) => {
     offer_date: Yup.date().required("Offer date is required"),
     img_status: Yup.string().required("Image status is required"),
     img1: Yup.mixed()
-    .test("image", "Unsupported file format", (value) => {
-      return !value || (value[0] && ["image/jpg", "image/jpeg", "image/png"].includes(value[0].type));
-    }),
-  
-  img2: Yup.mixed()
-    .test("image", "Unsupported file format", (value) => {
-      return !value || (value[0] && ["image/jpg", "image/jpeg", "image/png"].includes(value[0].type));
-    }),
-  
-  img3: Yup.mixed()
-    .test("image", "Unsupported file format", (value) => {
-      return !value || (value[0] && ["image/jpg", "image/jpeg", "image/png"].includes(value[0].type));
-    }),
+       .test("image", "Unsupported file format", (value) => {
+         return !value || (value[0] && ["image/jpg", "image/jpeg", "image/png"].includes(value[0].type));
+       }),
+     
+     img2: Yup.mixed()
+       .test("image", "Unsupported file format", (value) => {
+         return !value || (value[0] && ["image/jpg", "image/jpeg", "image/png"].includes(value[0].type));
+       }),
+     
+     img3: Yup.mixed()
+       .test("image", "Unsupported file format", (value) => {
+         return !value || (value[0] && ["image/jpg", "image/jpeg", "image/png"].includes(value[0].type));
+       }),
   });
 
   // Use react-hook-form with Yup validation
-  const { register, watch, handleSubmit, formState: { errors }, setValue } = useForm({
+  const { register,watch, handleSubmit, formState: { errors }, setValue } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       description: "",
       img_text: "",
       redirect_link: "",
       redirect_text: "",
-      property_type: "Destinations",
+      property_type: "",
       property_category: "",
       city: "",
       location_details: "",
       offer_date: new Date().toISOString().split("T")[0], 
-      img_status: true,
+      img_status: "",
       img1: null,
       img2: null,
       img3: null, 
@@ -68,7 +74,6 @@ const Property = ({ pageTitle }) => {
     Destinations: ["Leisure", "Business", "Heritage", "Wellness"],
     Meetings: ["Upcoming Events", "Meeting Rooms", "Banquet Area", "Wedding Venues", "Heritage", "Wellness"],
   };
-
   useEffect(() => {
     if (version !== "dark") {
       moodChange();
@@ -79,10 +84,44 @@ const Property = ({ pageTitle }) => {
     }
   }, [id, pageTitle, version]);
 
+  // Fetch the existing data if id is present (for editing)
+  const fetchOfferData = async (id) => {
+    try {
+        const response = await axios.post("http://localhost:4000/api/property/get-properties", { id: id },{
+            headers:{
+            }
+        });
+        const data = response.data[0];
+      setValue("description", data.description);
+      setValue("img_text", data.img_text);
+      setValue("redirect_link", data.redirect_link);
+      setValue("redirect_text", data.redirect_text);
+      setValue("property_type", data.property_type);
+      setValue("property_category", data.property_category);
+      setValue("city", data.city);
+      setValue("location_details", data.location_details);
+      setValue("offer_date", new Date(data.offer_date).toISOString().split("T")[0]);
+      setValue("img_status", data.img_status);
+     
+      const base64Image = `data:image/png;base64,${Buffer.from(data.img.data).toString("base64")}`;
+      setPreviewImg1(base64Image)
 
+      const base64Image2 = `data:image/png;base64,${Buffer.from(data.main_img.data).toString("base64")}`;
+      setPreviewImg2(base64Image2)
+
+      const base64Image3 = `data:image/png;base64,${Buffer.from(data.main_sub_img.data).toString("base64")}`;
+      setPreviewImg3(base64Image3)
+
+    } catch (error) {
+
+    }
+  };
+
+  // Form submit handler
   const onSubmit = async (data) => {
 
     const formData = new FormData();
+    formData.append("id", id); 
     formData.append("description", data.description);
     formData.append("img_text", data.img_text);
     formData.append("redirect_link", data.redirect_link);
@@ -100,8 +139,13 @@ const Property = ({ pageTitle }) => {
 
     try {
       const url = id ? "http://localhost:4000/api/property/update-property" : "http://localhost:4000/api/property/create-property";
-      await axios.post(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
-      router.push("/property/propertyList");
+      const response = await axios.post(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
+        if(response.status == 200){
+            window.location.reload()
+            // toast.success("Property Details Updated Succesfully")
+        }else{
+            // toast.error("Something went wrong")
+        }
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
@@ -160,7 +204,7 @@ const Property = ({ pageTitle }) => {
               </div>
              <div className="row mb-3">
 
-              <div className="col-md-6">
+             <div className="col-md-6">
                 <label className="form-label">Property Type</label>
                 <select className="form-control" {...register("property_type")} defaultValue="Destinations">
                 <option value="Destinations">Destinations</option>
@@ -214,50 +258,40 @@ const Property = ({ pageTitle }) => {
                 {errors.offer_date && <p className="text-danger">{errors.offer_date.message}</p>}
               </div>
               <div className="col-md-6">
-              <label className="form-label">Image Status</label>
-              <select className="form-control" {...register("img_status")} defaultValue={true}>
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </select>
-              {errors.img_status && <p className="text-danger">{errors.img_status.message}</p>}
-            </div>
-
+                <label className="form-label">Image Status</label>
+                <select className="form-control" {...register("img_status")}>
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                </select>
+                {errors.img_status && <p className="text-danger">{errors.img_status.message}</p>}
+                </div>
             </div>
 
             <div className="row mb-3">
 
-              <div className="col-md-6">
-                <label className="form-label">Image 1</label>
-                <input
-                  type="file"
-                  className="form-control"
-                  {...register("img1")}
-                />
-                {errors.img1 && <p className="text-danger">{errors.img1.message}</p>}
-              </div>
-              <div className="col-md-6">
-                <label className="form-label">Image 2</label>
-                <input
-                  type="file"
-                  className="form-control"
-                  {...register("img2")}
-                />
-                {errors.img2 && <p className="text-danger">{errors.img2.message}</p>}
-              </div>
+            <div className="col-md-6">
+                    <label className="form-label">Image 1</label>
+                    <input type="file" className="form-control" {...register("img1")} />
+                    {previewImg1 && <Image src={previewImg1} alt="Preview" width="100" height="100" />}
+                    {errors.img1 && <p className="text-danger">{errors.img1.message}</p>}
+                    </div>
 
+                    <div className="col-md-6">
+                    <label className="form-label">Image 2</label>
+                    <input type="file" className="form-control" {...register("img2")} />
+                    {previewImg2 && <Image src={previewImg2} alt="Preview" width="100" height="100" />}
+                    {errors.img2 && <p className="text-danger">{errors.img2.message}</p>}
+                    </div>
               </div>
 
 
               <div className="mb-3">
-                <label className="form-label">Image 3</label>
-                <input
-                  type="file"
-                  className="form-control"
-                  {...register("img3")}
-                />
-                {errors.img3 && <p className="text-danger">{errors.img3.message}</p>}
-              </div>
-              <div style={{display:'flex', justifyContent:"space-between"}}>
+              <label className="form-label">Image 3</label>
+                    <input type="file" className="form-control" {...register("img3")} />
+                    {previewImg3 && <Image src={previewImg3} alt="Preview" width="100" height="100" />}
+                    {errors.img3 && <p className="text-danger">{errors.img3.message}</p>}
+                    </div>
+                    <div style={{display:'flex', justifyContent:"space-between"}}>
                   <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                   {isSubmitting ? "Submitting..." : id ? "Update Offer" : "Create Offer"}
                   </button>

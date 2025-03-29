@@ -31,7 +31,10 @@ const Element = ({ pageTitle }) => {
   // Fetch hero details if ID is present
   const fetchHeroData = async (heroId) => {
     try {
-      const response = await axios.post("http://localhost:4000/api/hero/get-heros", { id: heroId });
+      const response = await axios.post("http://localhost:4000/api/hero/get-heros", { id: heroId },{
+        headers:{
+        }
+    });
       const heroData = response.data[0];
 
       if (heroData) {
@@ -147,9 +150,14 @@ const Element = ({ pageTitle }) => {
                     </div>
                   )}
 
+                  <div style={{display:'flex', justifyContent:"space-between"}}>
                   <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                     {isSubmitting ? "Submitting..." : id ? "Update Hero" : "Create Hero"}
                   </button>
+                  <button className="btn btn-primary" onClick={()=>router.push('/hero/herolist')}>
+                    Back
+                  </button>
+                  </div>
                 </form>
               </div>
             </div>

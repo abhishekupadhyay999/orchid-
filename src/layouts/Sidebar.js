@@ -521,7 +521,7 @@ const Sidebar = () => {
               </Link>
             </li>
             <li className={`${property.includes(path) ? "mm-active" : ""}`}>
-              <Link href="/property/createProperty" className="ai-icon" passHref>
+              <Link href="/property/propertylist" className="ai-icon" passHref>
                   <i className="flaticon-013-checkmark" />
                   <span className="nav-text">Property</span>                
               </Link>

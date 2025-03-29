@@ -23,6 +23,9 @@ const Element = ({pageTitle}) => {
       const [rows, setRows] = useState([]);
 
       useEffect(() => {
+
+        const fetch = async() =>{
+
         axios.post("http://localhost:4000/api/hero/get-heros",{},{
             headers:{
             }
@@ -38,6 +41,9 @@ const Element = ({pageTitle}) => {
             // setRows(formattedData);
           })
           .catch((error) => console.error("Error fetching data:", error));
+        }
+
+        fetch()
       }, []);
     
       const columns = [
@@ -87,7 +93,9 @@ const Element = ({pageTitle}) => {
         const response  = axios.post('http://localhost:4000/api/hero/delete-hero',payload, {
             headers: { }
         });
-        console.log(response)
+        if(response.data.status == 200){
+          fetch()
+        }
       }
       const handleEdit = (id) =>{
         router.push(`/hero/${id}`)

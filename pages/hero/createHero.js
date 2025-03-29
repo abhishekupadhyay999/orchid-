@@ -146,10 +146,14 @@ const Element = ({ pageTitle }) => {
                       <Image src={previewImage} alt="hero" width="150" height="150" />
                     </div>
                   )}
-
+                  <div style={{display:'flex', justifyContent:"space-between"}}>
                   <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                     {isSubmitting ? "Submitting..." : id ? "Update Hero" : "Create Hero"}
                   </button>
+                  <button className="btn btn-primary" onClick={()=>router.push('/hero/herolist')}>
+                    Back
+                  </button>
+                  </div>
                 </form>
               </div>
             </div>
