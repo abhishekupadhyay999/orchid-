@@ -515,7 +515,7 @@ const Sidebar = () => {
               </Link>
             </li>
             <li className={`${offer.includes(path) ? "mm-active" : ""}`}>
-              <Link href="/offer/createOffer" className="ai-icon" passHref>
+              <Link href="/offer/offerlist" className="ai-icon" passHref>
                   <i className="flaticon-043-menu" />
                   <span className="nav-text">Offer</span>                
               </Link>

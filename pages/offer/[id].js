@@ -9,14 +9,14 @@ import Image from "next/image";
 const Offer = ({ pageTitle }) => {
   const router = useRouter();
   const { id } = router.query;
-
   const version = useSelector((state) => state.theme.version);
+
   const [description, setDescription] = useState("");
   const [imgText, setImgText] = useState("");
   const [redirectLink, setRedirectLink] = useState("");
   const [locationDetails, setLocationDetails] = useState("");
-  const [offerDate, setOfferDate] = useState(new Date().toISOString().split("T")[0]);
-  const [imgStatus, setImgStatus] = useState(true);
+  const [offerDate, setOfferDate] = useState(new Date());
+  const [imgStatus, setImgStatus] = useState("");
   const [image, setImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [errors, setErrors] = useState({});
@@ -26,9 +26,34 @@ const Offer = ({ pageTitle }) => {
     if (version !== "dark") {
       moodChange();
     }
-    pageTitle("Create Offer");
+    pageTitle(id ? "Edit Offer" : "Create Offer");
+
+    if (id) {
+      fetchOfferData(id);
+    }
   }, [id, pageTitle, version]);
 
+  const fetchOfferData = async (offerID) => {
+    try {
+      const response = await axios.post("http://localhost:4000/api/offer/get-offers", { id: offerID });
+      const offerData = response.data[0];
+
+      if (offerData) {
+        setDescription(offerData.description);
+        setImgText(offerData.img_text);
+        setRedirectLink(offerData.redirect_link);
+        setLocationDetails(offerData.location_details);
+        setOfferDate(new Date(offerData.offer_date).toISOString().split("T")[0]);
+        setImgStatus(offerData.img_status);
+        if (offerData.img?.data) {
+          const base64Image = `data:image/png;base64,${Buffer.from(offerData.img.data).toString("base64")}`;
+          setPreviewImage(base64Image);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching offer data:", error);
+    }
+  };
 
   const validationSchema = Yup.object({
     description: Yup.string().required("Description is required"),
@@ -71,17 +96,16 @@ const Offer = ({ pageTitle }) => {
       setIsSubmitting(true);
       try {
         const formData = new FormData();
-
         formData.append("description", description);
         formData.append("img_text", imgText);
         formData.append("redirect_link", redirectLink);
         formData.append("location_details", locationDetails);
-        formData.append("offer_date", new Date(offerDate));
+        formData.append("offer_date", offerDate);
         formData.append("img_status", imgStatus);
         if (image) {
           formData.append("image", image);
         }
-      console.log(formData)
+        formData.append("id", id);
 
         const url = id ? "http://localhost:4000/api/offer/update-offer" : "http://localhost:4000/api/offer/create-offer";
         await axios.post(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
@@ -157,7 +181,7 @@ const Offer = ({ pageTitle }) => {
         className="form-control"
         value={offerDate}
         onChange={(e) => setOfferDate(e.target.value)}
-              />
+      />
       {errors.offer_date && <div className="text-danger">{errors.offer_date}</div>}
     </div>
     <div className="col-md-6">
