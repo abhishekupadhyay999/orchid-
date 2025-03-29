@@ -527,7 +527,7 @@ const Sidebar = () => {
               </Link>
             </li>
             <li className={`${video.includes(path) ? "mm-active" : ""}`}>
-              <Link href="/video/createVideo" className="ai-icon" passHref>
+              <Link href="/video/videolist" className="ai-icon" passHref>
                   <i className="flaticon-072-printer" />
                   <span className="nav-text">Video</span>                
               </Link>

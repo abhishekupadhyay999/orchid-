@@ -17,39 +17,55 @@ const Element = ({pageTitle}) => {
         if (version !== "dark") {
           moodChange();
         }
-        pageTitle("Hero Create");
+        pageTitle("Video Create");
       }, [pageTitle, version]);
 
       const [rows, setRows] = useState([]);
 
       useEffect(() => {
-        axios.post("http://localhost:4000/api/hero/get-heros",{},{
-            headers:{
-            }
-        })
+        axios
+          .post("http://localhost:4000/api/video/get-video", {})
           .then((response) => {
-            const formattedData = response.data.map((item) => ({
-              id: item.id,
-              title: item.title,
-              image: item.image ? `data:image/png;base64,${Buffer.from(item.image.data).toString("base64")}` : null,
-            }));
-            setRows(formattedData.map((obj, index) => ({ ...obj, srNo: index + 1 })))
-
-            // setRows(formattedData);
+            console.log("Videos fetched successfully");
+      
+            const formattedData = response.data.map((item, index) => {
+              let videoUrl = null;
+      
+              if (item.video) {
+                // Convert base64 string to Blob and create an Object URL
+                const blob = new Blob([new Uint8Array(item.video.data)], { type: "video/mp4" }); 
+                videoUrl = URL.createObjectURL(blob);
+              }
+      
+              return {
+                id: item.id,
+                videoUrl, // Store the generated video URL
+                srNo: index + 1, // Add serial number
+              };
+            });
+      
+            setRows(formattedData);
           })
           .catch((error) => console.error("Error fetching data:", error));
       }, []);
+      
     
       const columns = [
         { field: "srNo", headerName: "ID", width: 90, flex:1 },
-        { field: "title", headerName: "Title", width: 200, flex:1 },
         {
           field: "image",
           headerName: "Image",
           width: 150, 
           flex:1,
           renderCell: (params) =>
-            params.value ? <Image src={params.value} alt="hero" width="150" height="150" /> : "No Image",
+            params.value ? (
+              <video width="100" height="100" controls>
+                <source src={params.value} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              "Video Is Available but to big to render"
+            ),
         },
         {
             field: "actions",
@@ -84,21 +100,21 @@ const Element = ({pageTitle}) => {
         const payload = {
             id: id
         }
-        const response  = axios.post('http://localhost:4000/api/hero/delete-hero',payload, {
+        const response  = axios.post('http://localhost:4000/api/video/delete-video',payload, {
             headers: { }
         });
         console.log(response)
       }
       const handleEdit = (id) =>{
-        router.push(`/hero/${id}`)
+        router.push(`/video/${id}`)
       }
 
     return (
         <div className="col-12">
           <div className="card">
             <div className="card-header" style={{ display:'flex', justifyContent:'space-between'}}>
-              <h4 className="card-title">Hero List</h4>
-              <Button variant="contained" color="success" onClick={()=> router.push('/hero/createHero')}>
+              <h4 className="card-title">Video List</h4>
+              <Button variant="contained" color="success" onClick={()=> router.push('/video/createVideo')}>
                 Create
               </Button>
             </div>

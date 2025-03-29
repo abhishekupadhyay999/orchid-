@@ -4,15 +4,14 @@ import { connect, useSelector } from "react-redux";
 import * as Yup from "yup";
 import { moodChange, pageTitle } from "../../src/redux/action/utils";
 import axios from "axios";
-import Image from "next/image";
 
 const Element = ({ pageTitle }) => {
   const router = useRouter();
-  const { id } = router.query; // Get hero ID from URL
+  const { id } = router.query;
 
   const version = useSelector((state) => state.theme.version);
   const [video, setVideo] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null); // For displaying existing image
+  const [previewVideo, setPreviewVideo] = useState(null); // For displaying existing video
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -23,20 +22,17 @@ const Element = ({ pageTitle }) => {
     pageTitle(id ? "Edit Video" : "Create Video");
 
     if (id) {
-      fetchVideoData(id);
+      fetchHeroData(id);
     }
   }, [id, pageTitle, version]);
 
-  // Fetch hero details if ID is present
-  const fetchVideoData = async (videoId) => {
+  const fetchHeroData = async (heroId) => {
     try {
-      const response = await axios.post("http://localhost:4000/api/video/get-video", { id: videoId });
-      const videoData = response.data[0];
-
-      if (videoData) {
-        if (videoData.image.data) {
-          const base64Image = `data:image/png;base64,${Buffer.from(videoData.image.data).toString("base64")}`;
-          setPreviewImage(base64Image);
+      const response = await axios.post("http://localhost:4000/api/video/get-video", { id: heroId });
+      const heroData = response.data[0];
+      if (heroData) {
+        if (heroData.video) {
+          setPreviewVideo(heroData.video); // Assuming it's a URL
         }
       }
     } catch (error) {
@@ -46,24 +42,25 @@ const Element = ({ pageTitle }) => {
 
   // Validation schema
   const validationSchema = Yup.object({
-    video: Yup.mixed().required("Video is required").test("fileType", "Unsupported file format", (value) =>
-      !value || ["image/jpg", "image/jpeg", "image/png"].includes(value?.type)
+    video: Yup.mixed().test("fileType", "Unsupported file format", (value) =>
+      !value || ["video/mp4", "video/mov", "video/avi"].includes(value?.type)
     ),
   });
+
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setVideo(file);
 
-    // Show preview for new image selection
+    // Show preview for new video selection
     if (file) {
-      setPreviewImage(URL.createObjectURL(file));
+      setPreviewVideo(URL.createObjectURL(file));
     }
   };
 
   const validate = () => {
     try {
-      validationSchema.validateSync({ video }, { abortEarly: false });
+      validationSchema.validateSync({video }, { abortEarly: false });
       return {};
     } catch (error) {
       return error.inner.reduce((acc, currError) => {
@@ -83,13 +80,13 @@ const Element = ({ pageTitle }) => {
       try {
         const formData = new FormData();
         if (video) {
-          formData.append("image", video);
+          formData.append("video", video);
         }
-        formData.append("id", id); 
+        formData.append("id", id);
 
         const url = id ? "http://localhost:4000/api/video/update-video" : "http://localhost:4000/api/video/create-video";
         await axios.post(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
-        router.push("/video/videolist");
+        router.push("/hero/herolist");
       } catch (error) {
         console.error("Error submitting form:", error);
       } finally {
@@ -104,27 +101,30 @@ const Element = ({ pageTitle }) => {
         <div className="col-xl-6 col-lg-6">
           <div className="card">
             <div className="card-header">
-              <h4 className="card-title">{id ? "Edit Hero" : "Create Hero"}</h4>
+              <h4 className="card-title">{id ? "Edit Video" : "Create Video"}</h4>
             </div>
             <div className="card-body">
               <div className="basic-form">
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
-                    <label htmlFor="formFile" className="form-label">Image for Hero Section</label>
-                    <input className="form-control" type="file" id="formFile" name="video" onChange={handleFileChange} />
+                    <label htmlFor="formFile" className="form-label">Upload Video</label>
+                    <input className="form-control" type="file" id="formFile" name="video" accept="video/*" onChange={handleFileChange} />
                     {errors.video && <div className="text-danger">{errors.video}</div>}
                   </div>
 
-                  {/* Show existing image if editing */}
-                  {previewImage && (
+                  {/* Show existing video if editing */}
+                  {previewVideo && (
                     <div className="mb-3">
-                      <p>Current Image:</p>
-                      <Image src={previewImage} alt="hero" width="150" height="150" />
+                      <p>Current Video:</p>
+                      <video width="100%" controls>
+                        <source src={previewVideo} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
                     </div>
                   )}
 
                   <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                    {isSubmitting ? "Submitting..." : id ? "Update Hero" : "Create Hero"}
+                    {isSubmitting ? "Submitting..." : id ? "Update Video" : "Create Video"}
                   </button>
                 </form>
               </div>
