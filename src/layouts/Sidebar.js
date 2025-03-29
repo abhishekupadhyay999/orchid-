@@ -509,7 +509,7 @@ const Sidebar = () => {
               </Link>
             </li>
             <li className={`${insta.includes(path) ? "mm-active" : ""}`}>
-              <Link href="/insta/createInstaStories" className="ai-icon" passHref>
+              <Link href="/insta/instalist" className="ai-icon" passHref>
                   <i className="flaticon-013-checkmark" />
                   <span className="nav-text">Insta</span>                
               </Link>

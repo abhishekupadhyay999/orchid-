@@ -1,20 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import axios from "axios";
-import { pageTitle } from "../../src/redux/action/utils";
+import { moodChange, pageTitle } from "../../src/redux/action/utils";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import Image from "next/image";
 
-
 const InstaForm = ({ pageTitle }) => {
   const router = useRouter();
   const { id } = router.query;
+  const version = useSelector((state) => state.theme.version);
+  const [previewImg1, setPreviewImg1] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Define Yup schema for validation
   const schema = Yup.object().shape({
     img_text: Yup.string().required("Image text is required"),
     redirect_link: Yup.string().url("Invalid URL format").required("Redirect link is required"),
@@ -26,26 +26,53 @@ const InstaForm = ({ pageTitle }) => {
     }),
   });
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       img_text: "",
       redirect_link: "",
       redirect_text: "",
       img_position: "",
-      img_status: true,
+      img_status: "",
       img: null,
     },
   });
 
+  useEffect(() => {
+    if (version !== "dark") {
+      moodChange();
+    }
+    pageTitle("Edit Instas");
+    if (id) {
+      fetchOfferData(id);
+    }
+  }, [id, pageTitle, version]);
+
+  const fetchOfferData = async (id) => {
+    try {
+      const response = await axios.post("http://localhost:4000/api/insta/get-instas", { id });
+      const data = response.data[0];
+      setValue("img_text", data.img_text);
+      setValue("redirect_link", data.redirect_link);
+      setValue("redirect_text", data.redirect_text);
+      setValue("img_position", data.img_position);
+      setValue("img_status", String(data.img_status));
+
+      const base64Image = `data:image/png;base64,${Buffer.from(data.img.data).toString("base64")}`;
+      setPreviewImg1(base64Image);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   const onSubmit = async (data) => {
     const formData = new FormData();
+    formData.append("id", id);
     formData.append("img_text", data.img_text);
     formData.append("redirect_link", data.redirect_link);
     formData.append("redirect_text", data.redirect_text);
     formData.append("img_position", data.img_position);
     formData.append("img_status", data.img_status);
-    console.log(data.img)
     if (data.img) {
       formData.append("img", data.img[0]);
     }
@@ -69,7 +96,7 @@ const InstaForm = ({ pageTitle }) => {
             <h4 className="card-title">{id ? "Edit Insta" : "Create Insta"}</h4>
           </div>
           <div className="card-body">
-          <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className="row">
                 <div className="col-md-6">
                   <label className="form-label">Image Text</label>
@@ -108,6 +135,7 @@ const InstaForm = ({ pageTitle }) => {
                 <div className="col-md-6">
                 <label className="form-label">Upload Image</label>
                 <input type="file" className="form-control" {...register("img")} />
+                {previewImg1 && <Image src={previewImg1} alt="Preview" width="100" height="100" />}
                 {errors.img && <p className="text-danger">{errors.img.message}</p>}
               </div>
               </div>

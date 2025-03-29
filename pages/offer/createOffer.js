@@ -161,12 +161,20 @@ const Offer = ({ pageTitle }) => {
       {errors.offer_date && <div className="text-danger">{errors.offer_date}</div>}
     </div>
     <div className="col-md-6">
+              <label className="form-label">Image Status</label>
+              <select className="form-control" defaultValue={imgStatus}>
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+              {errors.img_status && <p className="text-danger">{errors.img_status.message}</p>}
+            </div>
+  </div>
+  <div className="col-md-12" style={{paddingBottom:"1rem"}}>
       <label className="form-label">Image</label>
       <input className="form-control" type="file" onChange={handleFileChange} />
       {errors.image && <div className="text-danger">{errors.image}</div>}
       {previewImage && <Image src={previewImage} alt="Offer" width={150} height={150} />}
     </div>
-  </div>
 
   <div className="d-flex" style={{justifyContent:"space-between"}}>
     <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
